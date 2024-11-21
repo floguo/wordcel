@@ -2,12 +2,6 @@
 
 > Etymology made easy
 
-Flora Guo  
-Faculty of Information  
-Bachelor of Information  
-INF452: Information Design Studio V: Coding  
-Fall 2024
-
 ## About
 Wordcel is a desktop app that helps you explore word origins and etymology in a simple, clean interface. No more clicking through sketchy websites or trying to parse confusing dictionary entries - just type in a word and get its story.
 
