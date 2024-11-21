@@ -1,82 +1,107 @@
-# Wordcel
 
-> Etymology made easy
+# Wordcel - A GUI Dictionary Application
 
-## About
-Wordcel is a desktop app that helps you explore word origins and etymology in a simple, clean interface. No more clicking through sketchy websites or trying to parse confusing dictionary entries - just type in a word and get its story.
+## Project Description
+**Wordcel** is a Python-based graphical user interface (GUI) application designed to provide word definitions, pronunciations, and examples in an accessible and user-friendly manner. The app integrates with the [DictionaryAPI](https://dictionaryapi.dev/) to fetch real-time word data and uses the `pygame` library for audio playback of pronunciations.
 
-### Features
-- Quick etymology lookups
-- Word origin tracing
-- Historical word forms
-- Clean, minimalist interface that's easy on the eyes
-- Built-in pronunciation guide
-
-### Built With
-- Python 3.8+
-- Tkinter for the UI
-- Free Dictionary API for etymology data
-
-## Getting Started
-
-### Prerequisites
-- Python 3.8 or newer
-- Some basic command line knowledge
-- Internet connection
-
-### Installation
-1. Install required packages:
-```bash
-pip install requests tkinter
-```
-
-2. Run the app:
-```bash
-python src/main.py
-```
-
-## Design Choices
-
-### Accessibility First
-- High contrast mode available
-- Adjustable text size
-- Keyboard navigation friendly
-- Clear, readable fonts
-- Simple, intuitive layout
-
-### User Experience
-- Clean, distraction-free interface
-- Quick response times
-- Helpful error messages when things go wrong
-- No unnecessary clicks or menus to navigate
-
-## Project Structure
-```
-wordcel/
-├── src/
-│   ├── api/
-│   │   └── etymology_service.py
-│   ├── gui/
-│   │   ├── main_window.py
-│   │   ├── search_frame.py
-│   │   ├── result_frame.py
-│   │   └── styles.py
-│   └── main.py
-└── README.md
-```
-
-## Known Limitations
-- English words only (for now)
-- Needs internet to work
-- Some really obscure words might not have data
-
-## What's Next
-- More languages
-- Offline mode
-- Pretty word evolution trees
-- "Word of the day" feature
-- Dark mode (because why not)
+This project demonstrates practical applications of Python's `tkinter` library for GUI design, alongside HTTP API integration and audio playback capabilities. The application includes features that enhance accessibility, making it inclusive for a diverse range of users.
 
 ---
 
-*Note: Example screenshots and detailed usage guide coming soon!*
+## Running the Program
+
+### Requirements
+
+Ensure the following dependencies are installed:
+
+- Python 3.8+
+- `requests` (for HTTP API calls)
+- `pygame` (for audio playback)
+
+Install the required libraries by running:
+
+```bash
+pip install requests pygame
+```
+
+### Execution Steps
+
+1. **Download the file:**
+   Save the Python file (`main.py`) on your local machine.
+
+2. **Run the program:**
+   Open a terminal or command prompt, navigate to the folder containing the file, and execute the following command:
+
+   ```bash
+   python main.py
+   ```
+
+3. **Use the application:**
+   - Enter a word in the text box.
+   - Click the "Define" button or press `Enter` to fetch the definition.
+   - Play pronunciation audio by clicking the respective button (e.g., "Play US pronunciation").
+
+---
+
+## Features
+
+1. **Search Functionality:**
+   - Enter a word to fetch its definition, part of speech, and examples.
+   - The program handles errors gracefully, showing a message if the word is not found.
+
+2. **Pronunciation Audio:**
+   - Pronunciation buttons allow users to hear the correct pronunciation in different accents (e.g., US, UK).
+
+3. **Accessible User Interface:**
+   - Simple, intuitive layout designed with `tkinter` for ease of use.
+   - Clear typography and layout suitable for a broad audience.
+
+---
+
+## Socio-Cultural Considerations
+
+### Accessibility
+- The app uses `ttk` for a modern, visually accessible interface.
+- Text fields and buttons are positioned for ease of navigation and interaction.
+
+### Cultural Inclusivity
+- Regional pronunciation (US, UK) provides linguistic flexibility for users from different backgrounds.
+
+### Customization for Users with Disabilities
+- The program’s layout supports keyboard navigation (e.g., pressing `Enter` triggers a search).
+- Future iterations could include text-to-speech output for visually impaired users.
+
+---
+
+## Example of Running the Program
+
+### Input
+- User enters the word "philosophy" in the search bar and clicks "Define."
+
+### Output
+The application displays:
+```
+Philosophy /fəˈlɒsəfi/
+
+1. noun
+Definition: The study of the fundamental nature of knowledge, reality, and existence, especially when considered as an academic discipline.
+Example: "He studied philosophy at university."
+
+Play US pronunciation | Play UK pronunciation
+```
+Clicking the pronunciation button plays the audio.
+
+---
+
+## Future Improvements
+
+The following features can be added to enhance the application:
+
+- **Synonyms and Antonyms:** Provide related words to enrich vocabulary.
+- **Etymology:** Display the origin and historical development of words.
+- **Related Words:** Suggest similar or associated terms.
+
+---
+
+## Authors
+**Flora (Flo) Guo**
