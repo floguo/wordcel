@@ -1,162 +1,238 @@
-import tkinter as tk # Basic Tkinter
-from tkinter import ttk # Themed Tkinter
-import requests # HTTP library for API calls
-import pygame # Audio playback
-import os # File system operations
-import tempfile # Temporary file operations (for audio files)
-import typing
+import tkinter as tk
+from tkinter import ttk
+import requests
+import pygame
+import os
+import tempfile
+
 
 class DictionaryApp:
     def __init__(self, root):
-        # Initialize the main window
-        self.root = root # Main window
-        self.root.title("Wordcel") # Window title
-        self.api_url = "https://api.dictionaryapi.dev/api/v2/entries/en/" # DictionaryAPI URL
-        pygame.mixer.init() # Initialize audio mixer for pronunciation
-        self.root.configure(bg="#f0f0f0") # Light gray background
+        """Initialize the dictionary application."""
+        self.root = root
+        self.root.title("Wordcel")
+        self.root.geometry("500x700")
+        self.api_url = "https://api.dictionaryapi.dev/api/v2/entries/en/"
+        pygame.mixer.init()
 
-        # Set minimum window size
-        self.root.minsize(300,400)
-        
-        # Search frame
-        search_frame = ttk.Frame(root, padding="24")
-        search_frame.grid(row=1, column=0, sticky="ew") # Position at top, sticky east-west
-        # Label for search field
-        search_label = ttk.Label(search_frame, text="Look up a word")
-        search_label.grid(row=0, column=0, sticky='w')
-        # Word entry field
-        self.word_entry = ttk.Entry(search_frame, width=32) 
-        self.word_entry.grid(row=1, column=0) # Position at top, sticky east-west
-        # Search button
-        search_button = ttk.Button(search_frame, text="Define", command=self.search_word)
-        search_button.grid(row=1, column=1, sticky='ns')
+        # Apply consistent styling and build the UI
+        self._setup_styles()
+        self._setup_ui()
 
-        # Configure columns and rows
-        search_frame.columnconfigure(0, weight=0)
-        search_frame.columnconfigure(1, weight=1)
-        
-        # Result frame
-        result_frame = ttk.Frame(root, padding=(24, 0, 24, 24))
-        result_frame.grid(row=2, column=0, sticky="nsew")
-        # Result text field
-        self.result_text = tk.Text(result_frame, height=24, width=55, wrap=tk.WORD) 
-        self.result_text.grid(row=0, column=0) # Fill frame
-        
-        # Bind Enter key to search
-        self.word_entry.bind('<Return>', lambda e: self.search_word()) # Lambda (anonymous function) takes an event e as argument
+    def _setup_styles(self):
+        """Configure custom styles for the application."""
+        style = ttk.Style()
+
+        # Define color palette
+        self.COLORS = {
+            'bg': '#2E2E2E',        # Dark background
+            'fg': '#FFFFFF',        # Light foreground (text)
+            'accent': '#3498db',    # Accent color (blue for buttons)
+            'hover': '#5dade2',     # Hover state for buttons
+            'text_bg': '#2E2E2E',   # Background for text widgets (matches root)
+            'error': '#FF4444',     # Error text color
+        }
+
+        # Set root window background color
+        self.root.configure(background=self.COLORS['bg'])
+
+        # Configure button styles
+        style.configure(
+            "Accent.TButton",
+            font=("Helvetica", 12, "bold"),
+            background=self.COLORS['accent'],
+            foreground=self.COLORS['fg'],
+            borderwidth=0,
+            padding=(10, 10),
+        )
+        style.map(
+            "Accent.TButton",
+            background=[("active", self.COLORS['hover']), ("pressed", self.COLORS['hover'])],
+        )
+
+        # Configure frame and label styles
+        style.configure("TFrame", background=self.COLORS['bg'])
+        style.configure("TLabel", background=self.COLORS['bg'], font=("Helvetica", 12), foreground=self.COLORS['fg'])
+
+        # Configure text entry styles
+        style.configure("TEntry", font=("Helvetica", 12), padding=10)
+
+    def _setup_ui(self):
+        """Build the user interface."""
+        # Frame for the search bar
+        search_frame = ttk.Frame(self.root, padding=20)
+        search_frame.pack(fill="x", pady=(20, 10))
+
+        # Label for the search input
+        search_label = ttk.Label(search_frame, text="Look up a word:")
+        search_label.pack(anchor="w")
+
+        # Input field for entering the word
+        self.word_entry = ttk.Entry(search_frame, width=40)
+        self.word_entry.pack(fill="x", pady=5)
+
+        # Button to trigger the search
+        search_button = ttk.Button(
+            search_frame, text="Define", command=self.search_word, style="Accent.TButton"
+        )
+        search_button.pack(pady=10)
+
+        # Frame for pronunciation buttons
+        self.audio_section_frame = ttk.Frame(self.root, padding=(20, 10))
+        self.audio_section_frame.pack(fill="x")
+
+        # Title for the audio section
+        self.audio_title = ttk.Label(
+            self.audio_section_frame, text="Play Audio", font=("Helvetica", 14, "bold")
+        )
+        self.audio_title.pack(anchor="center", pady=(5, 10))
+
+        # Frame to hold the pronunciation buttons
+        self.pronunciation_frame = ttk.Frame(self.audio_section_frame, padding=(0, 10))
+        self.pronunciation_frame.pack(anchor="center", pady=10)
+
+        # Frame for displaying the results with a scrollbar
+        result_frame = ttk.Frame(self.root, padding=20)
+        result_frame.pack(fill="both", expand=True, pady=(10, 20))
+
+        # Add a scrollbar to the result frame
+        self.scrollbar = ttk.Scrollbar(result_frame)
+        self.scrollbar.pack(side="right", fill="y")
+
+        # Non-editable text widget to display definitions
+        self.result_text = tk.Text(
+            result_frame,
+            height=20,
+            wrap="word",
+            font=("Helvetica", 12),
+            relief="flat",
+            borderwidth=0,
+            background=self.COLORS['text_bg'],
+            foreground=self.COLORS['fg'],
+            yscrollcommand=self.scrollbar.set,
+        )
+        self.result_text.pack(side="left", fill="both", expand=True)
+        self.result_text.configure(state="disabled")  # Make the text widget read-only
+        self.scrollbar.config(command=self.result_text.yview)  # Attach scrollbar to text widget
+
+        # Toggle button for showing/hiding examples
+        self.show_examples = tk.BooleanVar(value=True)
+        self.toggle_button = ttk.Button(
+            self.root,
+            text="Hide Examples",
+            command=self._toggle_examples,
+            style="Accent.TButton",
+        )
+        self.toggle_button.pack(pady=5)
+
+        # Bind Enter key to trigger search
+        self.word_entry.bind("<Return>", lambda e: self.search_word())
 
     def search_word(self):
-        # Get word (string)from user entry, strip whitespace, convert to lowercase
-        word = self.word_entry.get().strip().lower() 
-        # If no word (emp) is entered, return to avoid unnecessary API call
+        """Search for a word and display the results."""
+        word = self.word_entry.get().strip().lower()
         if not word:
+            self._update_result_text("Please enter a word.", is_error=True)
             return
-            
+
+        # Clear previous pronunciation buttons
+        for widget in self.pronunciation_frame.winfo_children():
+            widget.destroy()
+
         try:
-            # Make API call to DictionaryAPI
             response = requests.get(f"{self.api_url}{word}")
-            
-            # Clear previous results
-            self.result_text.delete(1.0, tk.END)
-            
-            # Handle successful API call (status code 200)
             if response.status_code == 200:
                 data = response.json()[0]
-                # Debug API response in terminal
-                print("API response:", data)
                 self.display_definition(data)
             else:
-                # Error: Word not found
-                self.result_text.insert(tk.END, "Word not found. Try another word?")
-                
+                self._update_result_text("Word not found. Try another word.", is_error=True)
         except Exception as e:
-            # Error: API call failed
-            self.result_text.insert(tk.END, "An error occurred. Please try again.")
-    
-    def _setup_acccessibility(self):
-        # Bind keyboard shortcuts
-        # self.root.bind('<Control-f>', lambda e: self_word_entry.focus()) # TODO: Focus on search field
-        self.word_entry.bind('<Return>', lambda e: self.search_word()) # Search when Enter key is pressed
-
-        # Set tab order
-        self.word_entry.lift()
-
-        # Add tooltips
-        self._create_tooltip(self.word_entry, "Enter a word to search")
-
-        # Set ARIA labels
-        self.word_entry.configure(name="word_search_entry")
-        self.result_text.configure(name="definition_results")
-
-        # Make text widget read-only, allow text to be copied
-        self.result_text.configure(state="disabled")
-
-    def play_pronunciation(self, audio_url):
-        # Initialize audio mixer if not already initialized
-        try:
-            if not pygame.mixer.get_init():
-                pygame.mixer.init()
-
-            # Download audio file
-            response = requests.get(audio_url)
-            if response.status_code == 200:
-                # Save to temporary file
-                with tempfile.NamedTemporaryFile(delete=False, suffix='.mp3') as temp_file:
-                    temp_file.write(response.content)
-                    temp_path = temp_file.name
-                pygame.mixer.music.load(temp_path)
-                pygame.mixer.music.play()
-                # Clean up temp file after delay
-                self.root.after(2000, lambda: os.unlink(temp_path))
-            else:
-                print(f"Failed to download audio file: {response.status_code}")
-        except Exception as e:
-            print(f"Error playing pronunciation audio: {e}")
+            self._update_result_text(f"An error occurred: {e}", is_error=True)
 
     def display_definition(self, data):
-        # Add play pronunciation audio button
-        # Frame to hold play audio button
-        button_frame = ttk.Frame(self.root)
-        button_frame.grid(row=3, column=0)
+        """Display the definition and pronunciation buttons."""
+        # Clear previous content
+        self.result_text.configure(state="normal")
+        self.result_text.delete("1.0", tk.END)
 
-        # Add buttons for available audio sources
-        for phonetic in data.get('phonetics', []):
-            if phonetic.get('audio'):
-                audio_url = phonetic['audio']
-                # Determine regional accent based on audio URL (UK or US)
-                region = 'UK' if 'uk' in audio_url else 'AU' if 'au' in audio_url else 'US'
-                # If audio URL is found, create a button to play pronunciation
-                ttk.Button(
-                    button_frame, 
-                    text=f"Play {region} pronunciation",
-                    command=lambda url=audio_url: self.play_pronunciation(url)
-                ).pack(side='left', pady=(0, 24))
+        # Display the word and phonetics
+        word = data['word'].capitalize()
+        phonetic = data.get('phonetic', '')
+        self.result_text.insert(tk.END, f"{word} {phonetic}\n\n", "title")
 
-        # Display word and definitions
-        word = data['word'] # Get word from API response
-        phonetic = data.get('phonetic', '') # Get phonetic symbol from API response
-        self.result_text.insert(tk.END, f"{word.capitalize()} {phonetic}\n\n")
-
-        # Display etymology if available
-        if 'origin' in data:
-            self.result_text.insert(tk.END, f"Etymology: {data['origin']}\n\n") 
-                               
-        # Display meanings and definitions  
-        # Create numbered list of meanings and definitions                           
-        for i, meaning in enumerate(data['meanings'], 1):
-            pos = meaning['partOfSpeech']
-            definition = meaning['definitions'][0]['definition']
-            
-            # Insert numbered list of meanings and definitions
-            self.result_text.insert(tk.END, f"{i}. {pos}\n")
-            self.result_text.insert(tk.END, f"Definition: {definition}\n")
-            
-            # Show example if available
-            example = meaning['definitions'][0].get('example', '')
-            if example:
-                self.result_text.insert(tk.END, f"Example: {example}\n")
-            
+        # Display meanings and definitions
+        for meaning in data.get('meanings', []):
+            part_of_speech = meaning['partOfSpeech'].capitalize()
+            self.result_text.insert(tk.END, f"{part_of_speech}:\n", "pos")
+            for definition in meaning['definitions']:
+                self.result_text.insert(tk.END, f" - {definition['definition']}\n", "definition")
+                if example := definition.get('example'):
+                    self.result_text.insert(tk.END, f"   Example: {example}\n", "example")
             self.result_text.insert(tk.END, "\n")
+
+        # Add pronunciation buttons for available audio
+        self._add_pronunciation_buttons(data.get('phonetics', []))
+
+        # Configure text widget styles
+        self.result_text.tag_configure("title", font=("Helvetica", 16, "bold"))
+        self.result_text.tag_configure("pos", font=("Helvetica", 14, "italic"), foreground="#d1d1d1")
+        self.result_text.tag_configure("definition", font=("Helvetica", 12))
+        self.result_text.tag_configure("example", font=("Helvetica", 12, "italic"), foreground="#b0c4de")
+
+        # Disable editing in the result text widget
+        self.result_text.configure(state="disabled")
+
+    def _add_pronunciation_buttons(self, phonetics):
+        """Add buttons to play pronunciation audio."""
+        for phonetic in phonetics:
+            if audio_url := phonetic.get('audio'):
+                # Determine accent if specified
+                accent = 'UK' if 'uk' in audio_url else 'US'
+                button = ttk.Button(
+                    self.pronunciation_frame,
+                    text=f"{accent} Pronunciation",
+                    command=lambda url=audio_url: self.play_pronunciation(url),
+                    style="Accent.TButton",
+                )
+                button.pack(side="left", padx=10)
+
+    def play_pronunciation(self, audio_url):
+        """Download and play the pronunciation audio."""
+        try:
+            response = requests.get(audio_url)
+            if response.status_code == 200:
+                with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as temp_file:
+                    temp_file.write(response.content)
+                    temp_path = temp_file.name
+
+                pygame.mixer.music.load(temp_path)
+                pygame.mixer.music.play()
+                self.root.after(5000, lambda: os.unlink(temp_path))  # Clean up after playback
+            else:
+                self._update_result_text("Failed to load pronunciation audio.", is_error=True)
+        except Exception as e:
+            self._update_result_text(f"Error playing audio: {e}", is_error=True)
+
+    def _toggle_examples(self):
+        """Toggle the visibility of examples."""
+        if self.show_examples.get():
+            self.result_text.tag_remove("example", "1.0", "end")
+            self.toggle_button.config(text="Show Examples")
+        else:
+            self.result_text.tag_add("example", "1.0", "end")
+            self.toggle_button.config(text="Hide Examples")
+        self.show_examples.set(not self.show_examples.get())
+
+    def _update_result_text(self, text, is_error=False):
+        """Update the result text widget."""
+        self.result_text.configure(state="normal")
+        self.result_text.delete("1.0", tk.END)
+        self.result_text.insert(tk.END, text)
+        self.result_text.tag_configure("error", foreground=self.COLORS['error'])
+        if is_error:
+            self.result_text.tag_add("error", "1.0", "end")
+        self.result_text.configure(state="disabled")
+
 
 if __name__ == "__main__":
     root = tk.Tk()
