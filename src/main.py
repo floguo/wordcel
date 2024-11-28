@@ -4,6 +4,7 @@ import requests # HTTP library for API calls
 import pygame # Audio playback
 import os # File system operations
 import tempfile # Temporary file operations (for audio files)
+import typing
 
 class DictionaryApp:
     def __init__(self, root):
@@ -12,6 +13,10 @@ class DictionaryApp:
         self.root.title("Wordcel") # Window title
         self.api_url = "https://api.dictionaryapi.dev/api/v2/entries/en/" # DictionaryAPI URL
         pygame.mixer.init() # Initialize audio mixer for pronunciation
+        self.root.configure(bg="#f0f0f0") # Light gray background
+
+        # Set minimum window size
+        self.root.minsize(300,400)
         
         # Search frame
         search_frame = ttk.Frame(root, padding="24")
@@ -67,6 +72,24 @@ class DictionaryApp:
         except Exception as e:
             # Error: API call failed
             self.result_text.insert(tk.END, "An error occurred. Please try again.")
+    
+    def _setup_acccessibility(self):
+        # Bind keyboard shortcuts
+        # self.root.bind('<Control-f>', lambda e: self_word_entry.focus()) # TODO: Focus on search field
+        self.word_entry.bind('<Return>', lambda e: self.search_word()) # Search when Enter key is pressed
+
+        # Set tab order
+        self.word_entry.lift()
+
+        # Add tooltips
+        self._create_tooltip(self.word_entry, "Enter a word to search")
+
+        # Set ARIA labels
+        self.word_entry.configure(name="word_search_entry")
+        self.result_text.configure(name="definition_results")
+
+        # Make text widget read-only, allow text to be copied
+        self.result_text.configure(state="disabled")
 
     def play_pronunciation(self, audio_url):
         # Initialize audio mixer if not already initialized
