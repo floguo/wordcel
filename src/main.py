@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+from tkmacosx import Button  # Import tkmacosx.Button
 import requests
 import pygame
 import os
@@ -15,47 +16,45 @@ class DictionaryApp:
         self.api_url = "https://api.dictionaryapi.dev/api/v2/entries/en/"
         pygame.mixer.init()
 
+        # Define colors for tkmacosx.Button
+        self.button_styles = {
+            'bg': '#3498db',  # Background color
+            'fg': '#FFFFFF',  # Foreground color
+            'hover': '#5dade2',  # Hover background
+        }
+
         # Apply consistent styling and build the UI
         self._setup_styles()
         self._setup_ui()
 
     def _setup_styles(self):
         """Configure custom styles for the application."""
-        style = ttk.Style()
-
-        # Define color palette
+        # Define a color palette
         self.COLORS = {
             'bg': '#2E2E2E',        # Dark background
             'fg': '#FFFFFF',        # Light foreground (text)
-            'accent': '#3498db',    # Accent color (blue for buttons)
-            'hover': '#5dade2',     # Hover state for buttons
-            'text_bg': '#2E2E2E',   # Background for text widgets (matches root)
+            'text_bg': '#2E2E2E',   # Background for text widgets
             'error': '#FF4444',     # Error text color
         }
 
         # Set root window background color
         self.root.configure(background=self.COLORS['bg'])
 
-        # Configure button styles
-        style.configure(
-            "Accent.TButton",
-            font=("Helvetica", 12, "bold"),
-            background=self.COLORS['accent'],
-            foreground=self.COLORS['fg'],
-            borderwidth=0,
-            padding=(10, 10),
+    def _create_custom_button(self, parent, text, command, **kwargs):
+        """
+        Helper to create tkmacosx.Button with consistent styles.
+        """
+        return Button(
+            parent,
+            text=text,
+            bg=self.button_styles['bg'],
+            fg=self.button_styles['fg'],
+            activebackground=self.button_styles['hover'],
+            activeforeground=self.button_styles['fg'],
+            borderless=1,
+            command=command,
+            **kwargs
         )
-        style.map(
-            "Accent.TButton",
-            background=[("active", self.COLORS['hover']), ("pressed", self.COLORS['hover'])],
-        )
-
-        # Configure frame and label styles
-        style.configure("TFrame", background=self.COLORS['bg'])
-        style.configure("TLabel", background=self.COLORS['bg'], font=("Helvetica", 12), foreground=self.COLORS['fg'])
-
-        # Configure text entry styles
-        style.configure("TEntry", font=("Helvetica", 12), padding=10)
 
     def _setup_ui(self):
         """Build the user interface."""
@@ -64,7 +63,10 @@ class DictionaryApp:
         search_frame.pack(fill="x", pady=(20, 10))
 
         # Label for the search input
-        search_label = ttk.Label(search_frame, text="Look up a word:")
+        search_label = ttk.Label(
+            search_frame, text="Look up a word:",
+            background=self.COLORS['bg'], foreground=self.COLORS['fg']
+        )
         search_label.pack(anchor="w")
 
         # Input field for entering the word
@@ -72,26 +74,12 @@ class DictionaryApp:
         self.word_entry.pack(fill="x", pady=5)
 
         # Button to trigger the search
-        search_button = ttk.Button(
-            search_frame, text="Define", command=self.search_word, style="Accent.TButton"
+        search_button = self._create_custom_button(
+            search_frame, "Define", self.search_word
         )
         search_button.pack(pady=10)
 
-        # Frame for pronunciation buttons
-        self.audio_section_frame = ttk.Frame(self.root, padding=(20, 10))
-        self.audio_section_frame.pack(fill="x")
-
-        # Title for the audio section
-        self.audio_title = ttk.Label(
-            self.audio_section_frame, text="Play Audio", font=("Helvetica", 14, "bold")
-        )
-        self.audio_title.pack(anchor="center", pady=(5, 10))
-
-        # Frame to hold the pronunciation buttons
-        self.pronunciation_frame = ttk.Frame(self.audio_section_frame, padding=(0, 10))
-        self.pronunciation_frame.pack(anchor="center", pady=10)
-
-        # Frame for displaying the results with a scrollbar
+        # Frame for displaying results
         result_frame = ttk.Frame(self.root, padding=20)
         result_frame.pack(fill="both", expand=True, pady=(10, 20))
 
@@ -115,18 +103,20 @@ class DictionaryApp:
         self.result_text.configure(state="disabled")  # Make the text widget read-only
         self.scrollbar.config(command=self.result_text.yview)  # Attach scrollbar to text widget
 
-        # Toggle button for showing/hiding examples
-        self.show_examples = tk.BooleanVar(value=True)
-        self.toggle_button = ttk.Button(
-            self.root,
-            text="Hide Examples",
-            command=self._toggle_examples,
-            style="Accent.TButton",
-        )
-        self.toggle_button.pack(pady=5)
+        # Frame for audio buttons
+        self.audio_section_frame = ttk.Frame(self.root, padding=(20, 10))
+        self.audio_section_frame.pack(fill="x")
 
-        # Bind Enter key to trigger search
-        self.word_entry.bind("<Return>", lambda e: self.search_word())
+        # Title for the audio section
+        self.audio_title = ttk.Label(
+            self.audio_section_frame, text="Play Audio", font=("Helvetica", 14, "bold"),
+            background=self.COLORS['bg'], foreground=self.COLORS['fg']
+        )
+        self.audio_title.pack(anchor="center", pady=(5, 10))
+
+        # Frame to hold the pronunciation buttons
+        self.pronunciation_frame = ttk.Frame(self.audio_section_frame, padding=(0, 10))
+        self.pronunciation_frame.pack(anchor="center", pady=10)
 
     def search_word(self):
         """Search for a word and display the results."""
@@ -188,11 +178,10 @@ class DictionaryApp:
             if audio_url := phonetic.get('audio'):
                 # Determine accent if specified
                 accent = 'UK' if 'uk' in audio_url else 'US'
-                button = ttk.Button(
+                button = self._create_custom_button(
                     self.pronunciation_frame,
-                    text=f"{accent} Pronunciation",
-                    command=lambda url=audio_url: self.play_pronunciation(url),
-                    style="Accent.TButton",
+                    f"{accent} Pronunciation",
+                    lambda url=audio_url: self.play_pronunciation(url)
                 )
                 button.pack(side="left", padx=10)
 
@@ -213,24 +202,11 @@ class DictionaryApp:
         except Exception as e:
             self._update_result_text(f"Error playing audio: {e}", is_error=True)
 
-    def _toggle_examples(self):
-        """Toggle the visibility of examples."""
-        if self.show_examples.get():
-            self.result_text.tag_remove("example", "1.0", "end")
-            self.toggle_button.config(text="Show Examples")
-        else:
-            self.result_text.tag_add("example", "1.0", "end")
-            self.toggle_button.config(text="Hide Examples")
-        self.show_examples.set(not self.show_examples.get())
-
     def _update_result_text(self, text, is_error=False):
         """Update the result text widget."""
         self.result_text.configure(state="normal")
         self.result_text.delete("1.0", tk.END)
         self.result_text.insert(tk.END, text)
-        self.result_text.tag_configure("error", foreground=self.COLORS['error'])
-        if is_error:
-            self.result_text.tag_add("error", "1.0", "end")
         self.result_text.configure(state="disabled")
 
 
