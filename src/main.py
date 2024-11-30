@@ -109,8 +109,8 @@ class DictionaryApp:
     def _setup_ui(self):
         """Build the user interface."""
         # Frame for the search bar
-        search_frame = ttk.Frame(self.root, padding=20)
-        search_frame.pack(fill="x", pady=(20, 10))
+        search_frame = ttk.Frame(self.root, padding=(20, 10))
+        search_frame.pack(fill="x", pady=(20, 0))
 
         # Label for the search input
         search_label = ttk.Label(
@@ -143,7 +143,7 @@ class DictionaryApp:
         self.root.bind("<Alt-s>", lambda e: self.word_entry.focus_set())
 
         # Frame for pronunciation buttons
-        self.audio_section_frame = ttk.Frame(self.root, padding=(10, 20))
+        self.audio_section_frame = ttk.Frame(self.root)
         self.audio_section_frame.pack(fill="x")
 
         # Title for the audio section
@@ -156,7 +156,7 @@ class DictionaryApp:
 
         # Frame for displaying the results with a scrollbar
         result_frame = ttk.Frame(self.root, padding=20)
-        result_frame.pack(fill="both", expand=True, pady=(10, 20))
+        result_frame.pack(fill="both", expand=True, pady=(0,20))
 
         # Add a scrollbar to the result frame
         self.scrollbar = ttk.Scrollbar(result_frame)
