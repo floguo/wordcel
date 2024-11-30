@@ -8,100 +8,80 @@ This project demonstrates practical applications of Python's `tkinter` library f
 
 ---
 
-## Running the Program
+## Running the Application
 
-### Requirements
-
-Ensure the following dependencies are installed:
-
-- Python 3.8+
-- `requests` (for HTTP API calls)
-- `pygame` (for audio playback)
-
-Install the required libraries by running:
-
-```bash
-pip install requests pygame
-```
-
-### Execution Steps
-
-1. **Download the file:**
-   Save the Python file (`main.py`) on your local machine.
-
-2. **Run the program:**
-   Open a terminal or command prompt, navigate to the folder containing the file, and execute the following command:
-
+1. **Clone the repository:**
    ```bash
-   python main.py
+   git clone <repository-url>
+   cd wordcel
    ```
 
-3. **Use the application:**
-   - Enter a word in the text box.
-   - Click the "Define" button or press `Enter` to fetch the definition.
-   - Play pronunciation audio by clicking the respective button (e.g., "Play US pronunciation").
+2. **Run the application:**
+   ```bash
+   python src/main.py
+   ```
 
 ---
 
-## Features
+## How to Use Wordcel
 
-1. **Search Functionality:**
-   - Enter a word to fetch its definition, part of speech, and examples.
-   - The program handles errors gracefully, showing a message if the word is not found.
+### Keybindings
+- **Tab Navigation:** Use the `Tab` key to navigate across buttons and inputs.
+- **Enter Key:** Press `Enter` on focused audio buttons to play pronunciations.
+- **Alt + S:** Focus on the search input field for faster word lookup.
 
-2. **Pronunciation Audio:**
-   - Pronunciation buttons allow users to hear the correct pronunciation in different accents (e.g., US, UK).
-
-3. **Accessible User Interface:**
-   - Simple, intuitive layout designed with `tkinter` for ease of use.
-   - Clear typography and layout suitable for a broad audience.
-
----
-
-## Socio-Cultural Considerations
-
-### Accessibility
-- The app uses `ttk` for a modern, visually accessible interface.
-- Text fields and buttons are positioned for ease of navigation and interaction.
-
-### Cultural Inclusivity
-- Regional pronunciation (US, UK) provides linguistic flexibility for users from different backgrounds.
-
-### Customization for Users with Disabilities
-- The program’s layout supports keyboard navigation (e.g., pressing `Enter` triggers a search).
-- Future iterations could include text-to-speech output for visually impaired users.
+### Steps to Use
+1. Type a word into the search bar.
+2. Click **“Define word”** or press `Enter` to fetch the word’s data.
+3. If audio pronunciations are available, click the appropriate button (e.g., **“Play US pronunciation”**) to listen.
 
 ---
 
-## Example of Running the Program
+## Recent Updates
 
-### Input
-- User enters the word "philosophy" in the search bar and clicks "Define."
+### Accessibility Improvements
+- Added keyboard navigation for all buttons.
+- Enabled `Enter` key playback for focused audio buttons.
+- Improved dynamic toggling for the **“Play Audio”** section, ensuring it’s only visible when applicable.
 
-### Output
-The application displays:
-```
+### Visual Enhancements
+- Implemented indentation and Roman numeral sub-indexing for better organization.
+- Simplified button hover and focus effects for a consistent experience.
+
+---
+
+## Example Output
+
+### Input:
+- User enters the word **“philosophy”** and clicks **“Define word.”**
+
+### Output:
+```plaintext
 Philosophy /fəˈlɒsəfi/
 
-1. noun
-Definition: The study of the fundamental nature of knowledge, reality, and existence, especially when considered as an academic discipline.
-Example: "He studied philosophy at university."
+1. Noun:
+   i. The study of the fundamental nature of knowledge, reality, and existence, especially when considered as an academic discipline.
+      Example: "He studied philosophy at university."
 
-Play US pronunciation | Play UK pronunciation
+Play US Pronunciation | Play UK Pronunciation
 ```
-Clicking the pronunciation button plays the audio.
+
+Clicking a pronunciation button plays the corresponding audio.
 
 ---
 
-## Future Improvements
+## Future Enhancements
 
-The following features can be added to enhance the application:
-
-- **Synonyms and Antonyms:** Provide related words to enrich vocabulary.
-- **Etymology:** Display the origin and historical development of words.
-- **Related Words:** Suggest similar or associated terms.
+- **Synonyms & Antonyms:** Add related words for a richer vocabulary experience.
+- **Word Etymology:** Provide historical origins of words.
+- **Offline Mode:** Cache frequently searched words for use without an internet connection.
 
 ---
 
-## Authors
-**Flora (Flo) Guo**
+## Notes on Development
+
+- The `requirements.txt` file ensures all dependencies are tracked for smooth setup.
+- For development, ensure to update `requirements.txt` if new libraries are added:
+  ```bash
+  pip freeze > requirements.txt
+  ```
