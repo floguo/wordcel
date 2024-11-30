@@ -1,11 +1,10 @@
-import tkinter as tk
-from tkinter import ttk
-from tkmacosx import Button  # Import tkmacosx.Button
-import requests
-import pygame
-import os
-import tempfile
-
+import tkinter as tk # Basic Tkinter
+from tkinter import ttk # Themed Tkinter
+import requests # HTTP library for API calls
+import pygame # Audio playback
+import os # File system operations
+import tempfile # Temporary file operations (for audio files)
+from tkmacosx import Button
 
 class DictionaryApp:
     def __init__(self, root):
@@ -14,6 +13,7 @@ class DictionaryApp:
         self.root.title("Wordcel")
         self.root.geometry("500x700")
         self.api_url = "https://api.dictionaryapi.dev/api/v2/entries/en/"
+
         pygame.mixer.init()
 
         # Define colors for tkmacosx.Button
@@ -33,7 +33,9 @@ class DictionaryApp:
         self.COLORS = {
             'bg': '#2E2E2E',        # Dark background
             'fg': '#FFFFFF',        # Light foreground (text)
-            'text_bg': '#2E2E2E',   # Background for text widgets
+            'accent': '#3498db',    # Accent color (blue for buttons)
+            'hover': '#5dade2',     # Hover state for buttons
+            'text_bg': '#2E2E2E',   # Background for text widgets (matches root)
             'error': '#FF4444',     # Error text color
         }
 
@@ -42,16 +44,16 @@ class DictionaryApp:
 
     def _create_custom_button(self, parent, text, command, **kwargs):
         """
-        Helper to create tkmacosx.Button with consistent styles.
+        Helper to create tkinter.Button with consistent styles.
         """
-        return Button(
+        return tk.Button(
             parent,
             text=text,
-            bg=self.button_styles['bg'],
-            fg=self.button_styles['fg'],
-            activebackground=self.button_styles['hover'],
-            activeforeground=self.button_styles['fg'],
-            borderless=1,
+            bg=self.COLORS['accent'],  # Use your color palette
+            fg=self.COLORS['fg'],      # Text color
+            activebackground=self.COLORS['hover'],  # Hover background color
+            activeforeground=self.COLORS['fg'],     # Hover text color
+            font=("Helvetica", 12, "bold"),         # Button font
             command=command,
             **kwargs
         )
@@ -174,17 +176,38 @@ class DictionaryApp:
 
     def _add_pronunciation_buttons(self, phonetics):
         """Add buttons to play pronunciation audio."""
+        print("Phonetics data:", phonetics)  # Debugging output
+
+        # Clear existing buttons in the pronunciation frame
+        for widget in self.pronunciation_frame.winfo_children():
+            widget.destroy()
+
+        # Track if any buttons are created
+        buttons_created = False
+
         for phonetic in phonetics:
-            if audio_url := phonetic.get('audio'):
-                # Determine accent if specified
-                accent = 'UK' if 'uk' in audio_url else 'US'
+            audio_url = phonetic.get('audio')
+            if audio_url:  # Only add buttons for valid audio URLs
+                accent = 'UK' if 'uk' in audio_url else 'AU' if 'au' in audio_url else 'US'
+                print(f"Adding button for {accent} audio: {audio_url}")  # Debugging output
+
+                # Create and pack the button
                 button = self._create_custom_button(
                     self.pronunciation_frame,
                     f"{accent} Pronunciation",
                     lambda url=audio_url: self.play_pronunciation(url)
                 )
                 button.pack(side="left", padx=10)
+                buttons_created = True
 
+        if not buttons_created:
+            # No audio available - show a placeholder message
+            no_audio_label = ttk.Label(
+                self.pronunciation_frame, text="No pronunciation available.",
+                background=self.COLORS['bg'], foreground=self.COLORS['fg']
+            )
+            no_audio_label.pack(anchor="center")
+            
     def play_pronunciation(self, audio_url):
         """Download and play the pronunciation audio."""
         try:
