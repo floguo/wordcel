@@ -171,6 +171,8 @@ class DictionaryApp:
             relief="flat",
             borderwidth=0,
             yscrollcommand=self.scrollbar.set,
+            padx=20,
+            pady=20
         )
         self.result_text.pack(side="left", fill="both", expand=True)
         self.result_text.configure(state="disabled")  # Make the text widget read-only
@@ -210,7 +212,7 @@ class DictionaryApp:
         # Display the word and phonetics
         word = data['word'].capitalize()
         phonetic = data.get('phonetic', '')
-        self.result_text.insert(tk.END, f"{word} {phonetic}\n\n", "title")
+        self.result_text.insert(tk.END, f"{word} {phonetic}\n", "title")
 
         # Display meanings and definitions
         for index, meaning in enumerate(data.get('meanings', []), start=1):
@@ -220,9 +222,10 @@ class DictionaryApp:
             for sub_index, definition in enumerate(meaning['definitions'], start=1):
                 # Use Roman numerals for sub-index
                 roman_index = self.int_to_roman(sub_index)
+                formatted_roman_index = f"{roman_index:>4}. " if roman_index else ""
                 self.result_text.insert(
                     tk.END,
-                    f"    {roman_index}. ",
+                    formatted_roman_index,
                     "definition_number"
                 )
                 # Indent the definition content as a block
@@ -234,20 +237,47 @@ class DictionaryApp:
                 if example := definition.get('example'):
                     self.result_text.insert(
                         tk.END,
-                        f"         Example: {example}\n",
+                        f"Example: {example}\n",
                         "example"
                     )
-            self.result_text.insert(tk.END, "\n")  # Add space after each meaning
+                self.result_text.insert(tk.END, "\n")  # Add space after each meaning
         
         # Add pronunciation buttons for available audio
         self._add_pronunciation_buttons(data.get('phonetics', [])) 
 
         # Configure text widget styles dynamically
-        self.result_text.tag_configure("title", font=("Helvetica", 16, "bold"))
-        self.result_text.tag_configure("pos", font=("Helvetica", 14, "italic"))
-        self.result_text.tag_configure("definition_number", font=("Helvetica", 12, "bold"))
-        self.result_text.tag_configure("definition", font=("Helvetica", 12), lmargin1=40, lmargin2=40)  # Left margin for blocks
-        self.result_text.tag_configure("example", font=("Helvetica", 12, "italic"), lmargin1=60, lmargin2=60)  # Further indentation
+        self.result_text.tag_configure(
+            "title", 
+            font=("Helvetica", 16, "bold"), 
+            lmargin2=24
+        )
+        self.result_text.tag_configure(
+            "pos", 
+            font=("Helvetica", 14, "italic"), 
+            spacing3=8, 
+            lmargin2=24
+        )
+        self.result_text.tag_configure(
+            "definition_number", 
+            font=("Helvetica", 12, "bold"), 
+            lmargin1=40,
+            lmargin2=40,
+            tabs=[60]
+        )
+        self.result_text.tag_configure(
+            "definition", 
+            font=("Helvetica", 12), 
+            lmargin1=60,
+            lmargin2=60, 
+            spacing3=8
+        )  # Left margin for blocks
+        self.result_text.tag_configure(
+            "example", 
+            font=("Helvetica", 12, "italic"), 
+            lmargin1=80,
+            lmargin2=80, 
+            spacing3=8
+        )  # Further indentation
         self.result_text.configure(state="disabled")
 
     def display_empty_state(self):
