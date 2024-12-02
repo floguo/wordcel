@@ -249,7 +249,8 @@ class DictionaryApp:
         self.result_text.tag_configure(
             "title", 
             font=("Helvetica", 16, "bold"), 
-            lmargin2=24
+            lmargin2=24,
+            spacing3=8
         )
         self.result_text.tag_configure(
             "pos", 
@@ -260,22 +261,22 @@ class DictionaryApp:
         self.result_text.tag_configure(
             "definition_number", 
             font=("Helvetica", 12, "bold"), 
-            lmargin1=40,
-            lmargin2=40,
-            tabs=[60]
+            lmargin1=20,
+            lmargin2=20,
+            tabs=[20]
         )
         self.result_text.tag_configure(
             "definition", 
             font=("Helvetica", 12), 
             lmargin1=60,
             lmargin2=60, 
-            spacing3=8
         )  # Left margin for blocks
         self.result_text.tag_configure(
             "example", 
             font=("Helvetica", 12, "italic"), 
             lmargin1=80,
             lmargin2=80, 
+            spacing1=4,
             spacing3=8
         )  # Further indentation
         self.result_text.configure(state="disabled")
