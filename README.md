@@ -15,8 +15,19 @@ This project demonstrates practical applications of Python's `tkinter` library f
    git clone <repository-url>
    cd wordcel
    ```
+2. **Set up virtual environment:**
+   ```bash
+   python -m venv venv  # Create a new environment
+   source venv/bin/activate  # macOS/Linux
+   venv\Scripts\activate     # Windows
+   ```
+   To ensure the virtual environment is activated, run `python` in the terminal. If it's activated, you should see `(venv)` in the prompt.
 
-2. **Run the application:**
+3. **Install dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+3. **Run the application:**
    ```bash
    python src/main.py
    ```

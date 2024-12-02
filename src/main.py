@@ -174,6 +174,7 @@ class DictionaryApp:
         )
         self.result_text.pack(side="left", fill="both", expand=True)
         self.result_text.configure(state="disabled")  # Make the text widget read-only
+        self.display_empty_state() # Show empty state initially
         self.scrollbar.config(command=self.result_text.yview)  # Attach scrollbar to text widget
 
         # Bind Enter key to trigger search
@@ -182,8 +183,8 @@ class DictionaryApp:
     def search_word(self):
         """Search for a word and display the results."""
         word = self.word_entry.get().strip().lower()
-        if not word:
-            self._update_result_text("Please enter a word.", is_error=True)
+        if not word: # Show empty state if input is empty
+            self.display_empty_state()
             return
 
         # Clear previous pronunciation buttons
@@ -247,6 +248,27 @@ class DictionaryApp:
         self.result_text.tag_configure("definition_number", font=("Helvetica", 12, "bold"))
         self.result_text.tag_configure("definition", font=("Helvetica", 12), lmargin1=40, lmargin2=40)  # Left margin for blocks
         self.result_text.tag_configure("example", font=("Helvetica", 12, "italic"), lmargin1=60, lmargin2=60)  # Further indentation
+        self.result_text.configure(state="disabled")
+
+    def display_empty_state(self):
+        """Display the empty state."""
+        self.result_text.configure(state="normal") # Enable editing
+        self.result_text.delete("1.0", tk.END) # Clear previous content
+
+        # Add empty state message
+        self.result_text.insert(tk.END, "\n\n🔍 Welcome to Wordcel!\n\n", "empty_title")
+        self.result_text.insert(
+            tk.END,
+            "Type a word in the search bar above and press 'Enter' or click 'Define Word' to see the definition.\n\n",
+            "empty_text"
+        )
+
+         # Configure text widget styles for empty state
+        self.result_text.tag_configure("empty_title", font=("Helvetica", 16, "bold"), foreground="#3498db", justify="center")
+        self.result_text.tag_configure("empty_text", font=("Helvetica", 12), foreground="#666666", justify="center")
+        self.result_text.tag_configure("empty_hint", font=("Helvetica", 12, "italic"), foreground="#888888", justify="center")
+
+        # Disable editing
         self.result_text.configure(state="disabled")
 
     def _add_pronunciation_buttons(self, phonetics):
