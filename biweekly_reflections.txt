@@ -1,0 +1,54 @@
+Biweekly Progress Report
+
+Project Name: Wordcel Dictionary App
+Project Team: Flora Guo, Deyu Li
+Project Submission Date: Dec 4, 2024
+Project Start Date: Nov 20, 2024
+
+
+Week of November 13 - November 19
+
+	•	Idea Discussion and Planning:
+	    •	Deyu and I discussed potential project ideas, and after brainstorming, we decided to build a dictionary app with a focus on functionality, UI/UX, and accessibility. The concept involved using Python with the Tkinter library for the interface and integrating an external API for dictionary definitions.
+	•	Key Milestones Achieved:
+	•	Finalized the project idea.
+	•	Outlined key features and technical requirements for the app.
+
+Week of November 20 - November 26
+
+	•	GitHub Repository Setup (November 20):
+        •	I set up the GitHub repository to allow the team to collaborate efficiently.
+        •	Ensured proper branching, README documentation, and dependencies tracking (via requirements.txt).
+	•	Initial Implementation:
+	    •	Added initial functionality to query and display dictionary definitions using an API.
+	    •	Created a basic Tkinter interface for user interactions.
+	•	Collaborative Support:
+    	•	Assisted Deyu in setting up his local environment for development (he uses IDLE and the terminal, while I use a fork of VS Code).
+	    •	Ensured we both had consistent setups for contributing code to the repository.
+
+Week of November 27 - December 3
+
+	•	UI/UX Development:
+        •	Improved the app layout and started styling the Tkinter interface.
+        •	Experimented with button styling using tkmacosx to enhance the visual presentation, which required significant trial and error.
+	•	Feature Enhancements:
+        •	Added accessibility features like ARIA labels, keyboard navigation, and tooltips to improve usability.
+        •	Worked on improving the readability of definitions using formatting techniques.
+	•	Function Implementation:
+        •	Added support for Roman numeral conversion in the app’s definition display for better organization.
+        •	Worked on modularizing styling and functionality to make the app easier to maintain and extend.
+
+Week of December 4 - December 6 (Current Week)
+
+	•	Fine-Tuning and Final Adjustments:
+        •	Refined the display of definitions to ensure a clean and user-friendly layout.
+        •	Added an empty state for when no word is searched, providing feedback to the user.
+        •	Incorporated UI padding adjustments and finalized styling for the app.
+        •	Hid the audio frame until valid pronunciation URLs are found to improve UI clarity.
+        •	Updated the README file with setup instructions for contributors, including a virtual environment setup (venv) and requirements.txt.
+
+Reflections
+
+	•	I feel proud of the progress we’ve made so far. Setting up the GitHub repository, assisting Deyu with his environment, and figuring out challenging aspects of styling and functionality have been rewarding.
+	•	Deyu contributed meaningfully by writing functions and collaborating effectively, which ensured we stayed on track as a team.
+	•	This project has been a great learning experience, especially in areas like API integration, styling Tkinter interfaces, and improving accessibility.
