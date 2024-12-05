@@ -12,7 +12,7 @@ This project demonstrates practical applications of Python's `tkinter` library f
 
 1. **Clone the repository:**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/floguo/wordcel.git
    cd wordcel
    ```
 2. **Set up virtual environment:**
